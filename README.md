@@ -42,7 +42,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 To access the admin dashboard:
 
-1. Navigate to `/admin`
+1. Navigate to `/polladmin`
 2. Default password: `ramadan2026` (⚠️ Change this in production!)
 3. View all volunteers grouped by date
 4. Export data to CSV format
@@ -59,7 +59,7 @@ src/
 │   │   │   └── route.ts          # Volunteer CRUD operations
 │   │   └── admin/
 │   │       └── route.ts          # Admin authentication & data
-│   ├── admin/
+│   ├── poladmin/
 │   │   └── page.tsx              # Admin dashboard
 │   ├── layout.tsx                # Root layout with metadata
 │   ├── page.tsx                  # Main volunteer registration page
