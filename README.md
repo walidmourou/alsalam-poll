@@ -30,7 +30,19 @@ A responsive Next.js application for managing volunteer registrations during Ram
 
 ## Getting Started
 
-First, run the development server:
+1. Copy the example environment file:
+
+```bash
+cp .env.example .env
+```
+
+2. Edit `.env` and set your admin password:
+
+```
+ADMIN_PASSWORD=your_secure_password_here
+```
+
+3. Run the development server:
 
 ```bash
 npm run dev
@@ -43,11 +55,11 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 To access the admin dashboard:
 
 1. Navigate to `/polladmin`
-2. Default password: `ramadan2026` (⚠️ Change this in production!)
+2. Enter the password you set in your `.env` file
 3. View all volunteers grouped by date
 4. Export data to CSV format
 
-**To change the admin password**: Edit the `ADMIN_PASSWORD` constant in `src/app/api/admin/route.ts`
+**To change the admin password**: Update the `ADMIN_PASSWORD` value in your `.env` file
 
 ## Project Structure
 
@@ -136,7 +148,8 @@ Change date constants in `src/lib/dates.ts`
 
 1. Push code to GitHub
 2. Import project in Vercel
-3. Deploy (SQLite database will persist on filesystem)
+3. Add environment variable: `ADMIN_PASSWORD` with your secure password
+4. Deploy (SQLite database will persist on filesystem)
 
 ### Other Platforms
 
@@ -148,7 +161,8 @@ Ensure the platform supports:
 
 ## Important Notes
 
-⚠️ **Security**: Change the admin password before deploying to production
+⚠️ **Security**: Set a strong admin password in your `.env` file
+🔒 **Environment**: Never commit your `.env` file to version control
 📱 **Mobile**: The app is fully responsive and touch-friendly
 🌍 **RTL**: Arabic text automatically displays right-to-left
 📊 **Data**: SQLite database is stored in the project root as `volunteers.db`

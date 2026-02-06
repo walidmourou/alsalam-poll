@@ -2,12 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 import db from "@/lib/db";
 import { Volunteer } from "@/lib/types";
 
-const ADMIN_PASSWORD = "ramadan2026"; // Change this to a secure password
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { password } = body;
+
+    if (!ADMIN_PASSWORD) {
+      return NextResponse.json(
+        { error: "Admin password not configured" },
+        { status: 500 },
+      );
+    }
 
     if (password !== ADMIN_PASSWORD) {
       return NextResponse.json({ error: "Invalid password" }, { status: 401 });

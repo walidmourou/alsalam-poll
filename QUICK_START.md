@@ -5,7 +5,7 @@
 Your Ramadan 2026 Volunteer Reservation System has been successfully built and is running at:
 
 - **Local**: http://localhost:3000
-- **Admin Panel**: http://localhost:3000/admin
+- **Admin Panel**: http://localhost:3000/polladmin
 
 ---
 
@@ -49,8 +49,8 @@ Your Ramadan 2026 Volunteer Reservation System has been successfully built and i
 
 ### For Administrators:
 
-1. Visit http://localhost:3000/admin
-2. Enter password: `ramadan2026` ⚠️ **Change this for production!**
+1. Visit http://localhost:3000/polladmin
+2. Enter the password from your `.env` file
 3. View all volunteers grouped by date
 4. Export data to CSV for records
 5. Switch language view if needed
@@ -59,12 +59,18 @@ Your Ramadan 2026 Volunteer Reservation System has been successfully built and i
 
 ## 🔧 Configuration
 
-### Change Admin Password
+### Set Admin Password
 
-Edit line 6 in `src/app/api/admin/route.ts`:
+1. Copy the example environment file:
 
-```typescript
-const ADMIN_PASSWORD = "YOUR_SECURE_PASSWORD_HERE";
+```bash
+cp .env.example .env
+```
+
+2. Edit `.env` and set your admin password:
+
+```
+ADMIN_PASSWORD=your_secure_password_here
 ```
 
 ### Modify Capacity Limits
@@ -98,9 +104,9 @@ Edit `src/lib/translations.ts` for German (`de`) and Arabic (`ar`) text.
   - Special indicator for Eid day (unlimited capacity)
 - **Registration Form**: Appears when clicking "Register"
 
-### Admin View (/admin)
+### Admin View (/polladmin)
 
-- **Authentication**: Password protection
+- **Authentication**: Password protection with environment variable
 - **Dashboard Stats**: Total volunteer count
 - **Data by Date**: All volunteers grouped by day
 - **Table View**: ID, Name, Phone, Registration timestamp
@@ -118,7 +124,7 @@ poll/
 │   │   ├── api/
 │   │   │   ├── volunteers/route.ts    # Main API
 │   │   │   └── admin/route.ts         # Admin API
-│   │   ├── admin/page.tsx             # Admin dashboard
+│   │   ├── polladmin/page.tsx         # Admin dashboard
 │   │   ├── page.tsx                   # Main page
 │   │   ├── layout.tsx                 # Root layout
 │   │   └── globals.css                # Styles with RTL
@@ -127,6 +133,8 @@ poll/
 │       ├── dates.ts                   # Date utilities
 │       ├── types.ts                   # TypeScript types
 │       └── translations.ts            # German & Arabic text
+├── .env                               # Environment variables (not in git)
+├── .env.example                       # Environment template
 ├── volunteers.db                      # SQLite database (auto-created)
 ├── package.json
 └── README.md
@@ -183,7 +191,7 @@ Authenticate and get all data:
 
 ```json
 {
-  "password": "ramadan2026"
+  "password": "your_password_from_env"
 }
 ```
 
@@ -193,7 +201,7 @@ Authenticate and get all data:
 
 ### Before Deployment:
 
-1. ⚠️ **Change the admin password** in `src/app/api/admin/route.ts`
+1. ⚠️ **Set a secure admin password** in your `.env` file
 2. ✅ Test on mobile devices (responsive design)
 3. ✅ Verify both languages work correctly
 4. ✅ Check database file is writable
@@ -201,9 +209,9 @@ Authenticate and get all data:
 
 ### Security:
 
-- Current admin auth is basic (password-only)
+- Admin auth uses environment variable for password
+- 🔒 Never commit your `.env` file to version control
 - For production, consider:
-  - Environment variables for passwords
   - Session management
   - Rate limiting on API routes
   - HTTPS enforcement
@@ -218,9 +226,9 @@ Authenticate and get all data:
 
 ## 🔄 Next Steps
 
-1. **Test the Application**: Visit http://localhost:3000
-2. **Test Admin Panel**: Visit http://localhost:3000/admin
-3. **Change Admin Password**: Before going live!
+1. **Set Admin Password**: Create `.env` file with `ADMIN_PASSWORD`
+2. **Test the Application**: Visit http://localhost:3000
+3. **Test Admin Panel**: Visit http://localhost:3000/polladmin
 4. **Customize Text**: Update translations if needed
 5. **Deploy**: Push to Vercel or similar platform
 
@@ -237,7 +245,7 @@ A: The `volunteers.db` file will be created automatically. Ensure write permissi
 A: Google Fonts (Noto Kufi Arabic) should load automatically. Check internet connection.
 
 **Q: Can't access admin panel?**
-A: Password is `ramadan2026` by default. Check console for errors.
+A: Check your `.env` file has `ADMIN_PASSWORD` set. Check console for errors.
 
 **Q: Dates not showing?**
 A: Dates are hardcoded for Ramadan 2026. Check `src/lib/dates.ts`.
