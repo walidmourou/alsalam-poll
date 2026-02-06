@@ -24,3 +24,34 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* RTL Support for Arabic */
+[dir="rtl"] {
+  font-family: 'Noto Kufi Arabic', Arial, sans-serif;
+}
+
+/* Proper RTL text alignment */
+[dir="rtl"] * {
+  text-align: start;
+}
+
+[dir="ltr"] * {
+  text-align: start;
+}
+
+/* Override specific alignment classes */
+[dir="rtl"] .text-left {
+  text-align: right !important;
+}
+
+[dir="rtl"] .text-right {
+  text-align: left !important;
+}
+
+[dir="ltr"] .text-left {
+  text-align: left !important;
+}
+
+[dir="ltr"] .text-right {
+  text-align: right !important;
+}
