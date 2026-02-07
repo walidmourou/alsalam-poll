@@ -32,7 +32,10 @@ export function isEidDay(date: string): boolean {
 }
 
 // Simple Hijri date conversion (approximation based on Ramadan 2026 starting on 1 Ramadan 1447)
-export function getHijriDate(gregorianDateStr: string): {
+export function getHijriDate(
+  gregorianDateStr: string,
+  locale: "de" | "ar" = "de",
+): {
   day: number;
   month: string;
   year: number;
@@ -46,10 +49,11 @@ export function getHijriDate(gregorianDateStr: string): {
 
   // Ramadan 2026 starts on 1 Ramadan 1447
   const hijriDay = diffDays + 1;
+  const monthName = locale === "ar" ? "رمضان" : "Ramadan";
 
   return {
     day: hijriDay,
-    month: "رمضان",
+    month: monthName,
     year: 1447,
   };
 }
@@ -61,7 +65,8 @@ export function formatDateForDisplay(
   const date = new Date(dateStr);
 
   if (locale === "ar") {
-    return date.toLocaleDateString("ar-SA", {
+    // Use ar-u-nu-latn to get Arabic text with Latin (Western) numerals
+    return date.toLocaleDateString("ar-u-nu-latn", {
       weekday: "long",
       year: "numeric",
       month: "long",
@@ -82,7 +87,7 @@ export function formatDateWithHijri(
   locale: "de" | "ar",
 ): string {
   const gregorian = formatDateForDisplay(dateStr, locale);
-  const hijri = getHijriDate(dateStr);
+  const hijri = getHijriDate(dateStr, locale);
 
   if (locale === "ar") {
     return `${gregorian}\n${hijri.day} ${hijri.month} ${hijri.year}`;

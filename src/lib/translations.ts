@@ -20,6 +20,10 @@ export const translations = {
     step1: "Wählen Sie einen Tag aus, der für Sie passt.",
     step2: "Geben Sie Ihren vollständigen Namen ein.",
     step3: "Geben Sie Ihre Telefonnummer für Kontaktzwecke ein.",
+    whatsappGroupTitle: "📱 WhatsApp-Gruppe für Freiwillige",
+    whatsappGroupMessage:
+      "Bitte treten Sie der WhatsApp-Gruppe der Freiwilligen bei für Updates und Koordination:",
+    joinGroup: "Zur Gruppe beitreten",
     availableDays: "Verfügbare Tage",
     eidSection: "Eid al-Fitr Freiwillige",
     eidDay: "Eid al-Fitr",
@@ -90,6 +94,10 @@ export const translations = {
     step1: "اختر اليوم المناسب لك.",
     step2: "أدخل الاسم الكامل.",
     step3: "أدخل رقم الهاتف للتواصل.",
+    whatsappGroupTitle: "📱 مجموعة واتساب للمتطوعين",
+    whatsappGroupMessage:
+      "يرجى الانضمام إلى مجموعة واتساب المتطوعين للحصول على التحديثات والتنسيق:",
+    joinGroup: "انضم للمجموعة",
     availableDays: "الأيام المتاحة",
     eidSection: "متطوعو عيد الفطر",
     eidDay: "عيد الفطر",

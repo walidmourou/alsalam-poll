@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { translations, Locale } from "@/lib/translations";
 import { formatDateForDisplay, getHijriDate } from "@/lib/dates";
 import { DayInfo } from "@/lib/types";
@@ -18,11 +18,26 @@ export default function Home() {
     text: string;
   } | null>(null);
 
+  const fullNameInputRef = useRef<HTMLInputElement>(null);
   const t = translations[locale];
 
   useEffect(() => {
     fetchDays();
   }, []);
+
+  useEffect(() => {
+    if (selectedDay && fullNameInputRef.current) {
+      // Scroll to the input field
+      fullNameInputRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+      // Focus on the input field
+      setTimeout(() => {
+        fullNameInputRef.current?.focus();
+      }, 300); // Small delay to ensure smooth scroll completes
+    }
+  }, [selectedDay]);
 
   const fetchDays = async () => {
     try {
@@ -151,6 +166,24 @@ export default function Home() {
             </div>
           </div>
 
+          {/* WhatsApp Group Link */}
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg shadow-md p-4 mb-4 border-2 border-green-300">
+            <h3 className="text-base font-bold text-green-700 mb-2 flex items-center justify-center">
+              {t.whatsappGroupTitle}
+            </h3>
+            <p className="text-sm text-gray-700 mb-3 text-center">
+              {t.whatsappGroupMessage}
+            </p>
+            <a
+              href="https://chat.whatsapp.com/GFGWiytD5Ul5lNXMv0pdm1"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center w-full md:w-auto mx-auto bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition font-bold text-sm shadow-md"
+            >
+              {t.joinGroup}
+            </a>
+          </div>
+
           <div className="space-y-2">
             <p className="text-xs text-emerald-700 bg-emerald-50 p-2 rounded font-semibold">
               {t.eidVolunteerNote}
@@ -194,7 +227,7 @@ export default function Home() {
                 {selectedDay !== "EID" && (
                   <div className="text-xs text-emerald-600 font-semibold mt-1">
                     {(() => {
-                      const hijri = getHijriDate(selectedDay);
+                      const hijri = getHijriDate(selectedDay, locale);
                       return `${hijri.day} ${hijri.month} ${hijri.year}`;
                     })()}
                   </div>
@@ -205,13 +238,14 @@ export default function Home() {
                   {t.fullName}
                 </label>
                 <input
+                  ref={fullNameInputRef}
                   type="text"
                   value={formData.fullName}
                   onChange={(e) =>
                     setFormData({ ...formData, fullName: e.target.value })
                   }
                   required
-                  className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
+                  className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm text-gray-900"
                   placeholder={t.fullName}
                 />
               </div>
@@ -226,7 +260,7 @@ export default function Home() {
                     setFormData({ ...formData, phoneNumber: e.target.value })
                   }
                   required
-                  className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
+                  className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm text-gray-900"
                   placeholder="+49..."
                 />
               </div>
@@ -234,14 +268,14 @@ export default function Home() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="flex-1 bg-emerald-600 text-white py-2 rounded hover:bg-emerald-700 transition disabled:bg-gray-400 font-bold text-sm"
+                  className="flex-1 bg-emerald-600 text-white py-2 rounded hover:bg-emerald-700 transition disabled:bg-gray-400 font-bold text-sm inline-flex items-center justify-center"
                 >
                   {submitting ? t.loading : t.submit}
                 </button>
                 <button
                   type="button"
                   onClick={() => setSelectedDay(null)}
-                  className="flex-1 bg-gray-200 text-gray-700 py-2 rounded hover:bg-gray-300 transition font-bold text-sm"
+                  className="flex-1 bg-gray-200 text-gray-700 py-2 rounded hover:bg-gray-300 transition font-bold text-sm inline-flex items-center justify-center"
                 >
                   {t.cancel}
                 </button>
@@ -271,7 +305,7 @@ export default function Home() {
                   </div>
                   <div className="text-xs text-emerald-600 font-semibold mt-0.5">
                     {(() => {
-                      const hijri = getHijriDate(day.date);
+                      const hijri = getHijriDate(day.date, locale);
                       return `${hijri.day} ${hijri.month} ${hijri.year}`;
                     })()}
                   </div>
