@@ -27,7 +27,7 @@ export async function GET() {
     `)) as any[];
 
     const countsMap = new Map(
-      counts.map((c) => [
+      counts.map((c: any) => [
         c.date,
         {
           count: c.count,
