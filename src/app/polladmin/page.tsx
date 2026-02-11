@@ -44,9 +44,13 @@ export default function AdminPage() {
     }
   };
 
-  const handleDelete = async (id: number, fullName: string) => {
+  const handleDelete = async (
+    id: number,
+    firstName: string,
+    lastName: string,
+  ) => {
     const t = translations[locale];
-    if (!confirm(`${t.confirmDelete} ${fullName}؟`)) {
+    if (!confirm(`${t.confirmDelete} ${firstName} ${lastName}؟`)) {
       return;
     }
 
@@ -88,13 +92,21 @@ export default function AdminPage() {
 
   const exportToCSV = () => {
     const csvRows = [
-      ["Date", "Full Name", "Phone Number", "Registered At"].join(","),
+      ["Date", "First Name", "Last Name", "Phone Number", "Registered At"].join(
+        ",",
+      ),
     ];
 
     Object.entries(data).forEach(([date, volunteers]) => {
       volunteers.forEach((vol) => {
         csvRows.push(
-          [date, vol.full_name, vol.phone_number, vol.created_at].join(","),
+          [
+            date,
+            vol.first_name,
+            vol.last_name,
+            vol.phone_number,
+            vol.created_at,
+          ].join(","),
         );
       });
     });
@@ -150,7 +162,7 @@ export default function AdminPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-emerald-600 text-white py-3 rounded-lg hover:bg-emerald-700 transition disabled:bg-gray-400 font-bold"
+              className="w-full bg-emerald-600 text-white py-3 rounded-lg hover:bg-emerald-700 transition disabled:bg-gray-400 font-bold flex items-center justify-center"
             >
               {loading ? t.loading : t.login}
             </button>
@@ -251,7 +263,7 @@ export default function AdminPage() {
                           >
                             <td className="p-3 text-gray-700">{idx + 1}</td>
                             <td className="p-3 text-gray-900 font-semibold">
-                              {vol.full_name}
+                              {vol.first_name} {vol.last_name}
                             </td>
                             <td className="p-3 text-gray-700">
                               {vol.phone_number}
@@ -262,7 +274,11 @@ export default function AdminPage() {
                             <td className="p-3">
                               <button
                                 onClick={() =>
-                                  handleDelete(vol.id, vol.full_name)
+                                  handleDelete(
+                                    vol.id,
+                                    vol.first_name,
+                                    vol.last_name,
+                                  )
                                 }
                                 disabled={deleting === vol.id}
                                 className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition disabled:bg-gray-400 text-sm font-semibold"

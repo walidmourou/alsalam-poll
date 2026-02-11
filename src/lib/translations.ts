@@ -31,7 +31,7 @@ export const translations = {
     eidDescription:
       "Freiwilligenarbeit ist offen für die Organisation des Eid-Gebets. Unbegrenzte Plätze verfügbar.",
     eidVolunteerNote:
-      "التطوع مفتوح لتنظيم صلاة العيد - Freiwilligenarbeit ist auch für die Organisation des Eid-Gebets offen",
+      "Freiwilligenarbeit ist auch für die Organisation des Eid-Gebets offen",
     ramadanNote:
       "* Hinweis: Ramadan kann 29 oder 30 Tage dauern. Wenn es 29 Tage sind, endet Ramadan am 19. März und Eid al-Fitr ist am 20. März.",
     spotsRemaining: "Freie Plätze",
@@ -41,16 +41,20 @@ export const translations = {
     registerForDay: "Registrieren",
     registrationForm: "Registrierungsformular",
     selectDate: "Tag auswählen",
+    firstName: "Vorname",
+    lastName: "Nachname",
     fullName: "Vollständiger Name",
     phoneNumber: "Telefonnummer",
     submit: "Absenden",
     cancel: "Abbrechen",
     successMessage:
-      "Vielen Dank für Ihre Registrierung! Möge Allah Ihre Bemühungen annehmen.",
+      "Vielen Dank für Ihre Registrierung! Möge Allah von Ihnen annehmen.",
     errorMessage:
       "Fehler bei der Registrierung. Bitte versuchen Sie es erneut.",
     dayFullError:
       "Dieser Tag ist bereits voll. Bitte wählen Sie einen anderen Tag.",
+    alreadyRegisteredError:
+      "Sie haben sich bereits für diesen Tag registriert.",
     languageSwitch: "عربي",
     loading: "Laden...",
     // Admin translations
@@ -113,6 +117,8 @@ export const translations = {
     registerForDay: "تسجيل",
     registrationForm: "نموذج التسجيل",
     selectDate: "اختر اليوم",
+    firstName: "الاسم الأول",
+    lastName: "اسم العائلة",
     fullName: "الاسم الكامل",
     phoneNumber: "رقم الهاتف",
     submit: "إرسال",
@@ -120,6 +126,7 @@ export const translations = {
     successMessage: "شكراً لتسجيلك! تقبل الله منكم.",
     errorMessage: "خطأ في التسجيل. يرجى المحاولة مرة أخرى.",
     dayFullError: "هذا اليوم مكتمل. يرجى اختيار يوم آخر.",
+    alreadyRegisteredError: "لقد قمت بالتسجيل بالفعل لهذا اليوم.",
     languageSwitch: "Deutsch",
     loading: "جاري التحميل...", // Admin translations
     adminLogin: "تسجيل دخول المسؤول",

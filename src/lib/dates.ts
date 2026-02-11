@@ -1,7 +1,9 @@
-// Ramadan 2026: February 19 - March 20 (or March 19 if 29 days)
-// Eid al-Fitr: March 21 (or March 20 if Ramadan is 29 days)
+// Ramadan 2026: Starts with 30 Shaban (Feb 18) - 29 Ramadan (March 19)
+// 30 Shaban 1447: February 18, 2026
+// 1-29 Ramadan 1447: February 19 - March 19, 2026
+// Eid al-Fitr: March 20, 2026
 
-export const RAMADAN_START = "2026-02-19";
+export const RAMADAN_START = "2026-02-18";
 export const RAMADAN_END_30_DAYS = "2026-03-20";
 export const RAMADAN_END_29_DAYS = "2026-03-19";
 export const EID_30_DAYS = "2026-03-21";
@@ -13,7 +15,7 @@ export const REGULAR_DAY_CAPACITY = 3;
 export function generateRamadanDates(): string[] {
   const dates: string[] = [];
   const start = new Date(RAMADAN_START);
-  const end = new Date(RAMADAN_END_30_DAYS);
+  const end = new Date(RAMADAN_END_29_DAYS);
 
   for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
     dates.push(d.toISOString().split("T")[0]);
@@ -31,7 +33,7 @@ export function isEidDay(date: string): boolean {
   return date === EID_30_DAYS || date === EID_29_DAYS;
 }
 
-// Simple Hijri date conversion (approximation based on Ramadan 2026 starting on 1 Ramadan 1447)
+// Simple Hijri date conversion (approximation based on Feb 18, 2026 = 30 Shaban 1447)
 export function getHijriDate(
   gregorianDateStr: string,
   locale: "de" | "ar" = "de",
@@ -40,16 +42,27 @@ export function getHijriDate(
   month: string;
   year: number;
 } {
-  const ramadanStart = new Date(RAMADAN_START);
+  const startDate = new Date(RAMADAN_START); // Feb 18, 2026 = 30 Shaban
   const currentDate = new Date(gregorianDateStr);
 
-  // Calculate days difference from Ramadan start
-  const diffTime = currentDate.getTime() - ramadanStart.getTime();
+  // Calculate days difference from start date (30 Shaban)
+  const diffTime = currentDate.getTime() - startDate.getTime();
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-  // Ramadan 2026 starts on 1 Ramadan 1447
-  const hijriDay = diffDays + 1;
-  const monthName = locale === "ar" ? "رمضان" : "Ramadan";
+  // Feb 18, 2026 = 30 Shaban 1447
+  // Feb 19, 2026 = 1 Ramadan 1447
+  let hijriDay: number;
+  let monthName: string;
+
+  if (diffDays === 0) {
+    // First day: 30 Shaban
+    hijriDay = 30;
+    monthName = locale === "ar" ? "شعبان" : "Shaban";
+  } else {
+    // Following days: Ramadan (starting from day 1)
+    hijriDay = diffDays;
+    monthName = locale === "ar" ? "رمضان" : "Ramadan";
+  }
 
   return {
     day: hijriDay,
@@ -62,6 +75,11 @@ export function formatDateForDisplay(
   dateStr: string,
   locale: "de" | "ar",
 ): string {
+  // Handle special Eid identifier
+  if (dateStr === "EID") {
+    return locale === "ar" ? "عيد الفطر" : "Eid al-Fitr";
+  }
+
   const date = new Date(dateStr);
 
   if (locale === "ar") {

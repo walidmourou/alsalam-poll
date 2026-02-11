@@ -21,12 +21,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Fetch all volunteers grouped by date
-    const stmt = db.prepare(`
+    const [volunteers] = (await db.query(`
       SELECT * FROM volunteers
       ORDER BY date, created_at
-    `);
-
-    const volunteers = stmt.all() as Volunteer[];
+    `)) as any[];
 
     // Group by date
     const groupedByDate = volunteers.reduce(

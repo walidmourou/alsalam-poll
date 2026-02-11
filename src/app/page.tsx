@@ -11,14 +11,18 @@ export default function Home() {
   const [eidDay, setEidDay] = useState<DayInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
-  const [formData, setFormData] = useState({ fullName: "", phoneNumber: "" });
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    phoneNumber: "",
+  });
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<{
     type: "success" | "error";
     text: string;
   } | null>(null);
 
-  const fullNameInputRef = useRef<HTMLInputElement>(null);
+  const firstNameInputRef = useRef<HTMLInputElement>(null);
   const t = translations[locale];
 
   useEffect(() => {
@@ -26,15 +30,15 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (selectedDay && fullNameInputRef.current) {
+    if (selectedDay && firstNameInputRef.current) {
       // Scroll to the input field
-      fullNameInputRef.current.scrollIntoView({
+      firstNameInputRef.current.scrollIntoView({
         behavior: "smooth",
         block: "center",
       });
       // Focus on the input field
       setTimeout(() => {
-        fullNameInputRef.current?.focus();
+        firstNameInputRef.current?.focus();
       }, 300); // Small delay to ensure smooth scroll completes
     }
   }, [selectedDay]);
@@ -65,24 +69,28 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           date: selectedDay,
-          full_name: formData.fullName,
+          first_name: formData.firstName,
+          last_name: formData.lastName,
           phone_number: formData.phoneNumber,
         }),
       });
 
       if (response.ok) {
         setMessage({ type: "success", text: t.successMessage });
-        setFormData({ fullName: "", phoneNumber: "" });
+        setFormData({ firstName: "", lastName: "", phoneNumber: "" });
         setSelectedDay(null);
         await fetchDays(); // Refresh the list
       } else {
         const error = await response.json();
+        let errorText = t.errorMessage;
+        if (error.error === "This day is already full") {
+          errorText = t.dayFullError;
+        } else if (error.error === "Already registered for this day") {
+          errorText = t.alreadyRegisteredError;
+        }
         setMessage({
           type: "error",
-          text:
-            error.error === "This day is already full"
-              ? t.dayFullError
-              : t.errorMessage,
+          text: errorText,
         });
       }
     } catch (error) {
@@ -174,14 +182,16 @@ export default function Home() {
             <p className="text-sm text-gray-700 mb-3 text-center">
               {t.whatsappGroupMessage}
             </p>
-            <a
-              href="https://chat.whatsapp.com/GFGWiytD5Ul5lNXMv0pdm1"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center w-full md:w-auto mx-auto bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition font-bold text-sm shadow-md"
-            >
-              {t.joinGroup}
-            </a>
+            <div className="flex justify-center">
+              <a
+                href="https://chat.whatsapp.com/GFGWiytD5Ul5lNXMv0pdm1"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center bg-green-600 text-white px-8 py-4 rounded-lg hover:bg-green-700 transition font-bold text-lg shadow-lg"
+              >
+                {t.joinGroup}
+              </a>
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -235,18 +245,33 @@ export default function Home() {
               </div>
               <div>
                 <label className="block text-gray-700 font-semibold mb-1 text-sm">
-                  {t.fullName}
+                  {t.firstName}
                 </label>
                 <input
-                  ref={fullNameInputRef}
+                  ref={firstNameInputRef}
                   type="text"
-                  value={formData.fullName}
+                  value={formData.firstName}
                   onChange={(e) =>
-                    setFormData({ ...formData, fullName: e.target.value })
+                    setFormData({ ...formData, firstName: e.target.value })
                   }
                   required
                   className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm text-gray-900"
-                  placeholder={t.fullName}
+                  placeholder={t.firstName}
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700 font-semibold mb-1 text-sm">
+                  {t.lastName}
+                </label>
+                <input
+                  type="text"
+                  value={formData.lastName}
+                  onChange={(e) =>
+                    setFormData({ ...formData, lastName: e.target.value })
+                  }
+                  required
+                  className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm text-gray-900"
+                  placeholder={t.lastName}
                 />
               </div>
               <div>
@@ -332,9 +357,9 @@ export default function Home() {
                         <li
                           key={idx}
                           className="text-gray-600 truncate"
-                          title={vol.full_name}
+                          title={`${vol.first_name} ${vol.last_name}`}
                         >
-                          • {vol.full_name}
+                          • {vol.first_name} {vol.last_name.charAt(0)}.
                         </li>
                       ))}
                     </ul>
@@ -380,7 +405,7 @@ export default function Home() {
                   <ul className="grid grid-cols-2 md:grid-cols-3 gap-2">
                     {eidDay.volunteers.map((vol, idx) => (
                       <li key={idx} className="text-sm text-gray-700">
-                        • {vol.full_name}
+                        • {vol.first_name} {vol.last_name.charAt(0)}.
                       </li>
                     ))}
                   </ul>

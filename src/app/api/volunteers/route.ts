@@ -8,28 +8,33 @@ import {
 } from "@/lib/dates";
 import { DayInfo } from "@/lib/types";
 
-const ADMIN_PASSWORD = "ramadan2026";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+
+// Cache for 30 seconds to reduce database load
+export const revalidate = 30;
 
 export async function GET() {
   try {
     const allDates = generateRamadanDates();
 
     // Get volunteer counts for all dates
-    const countsStmt = db.prepare(`
+    const [counts] = (await db.query(`
       SELECT date, COUNT(*) as count, 
-             GROUP_CONCAT(full_name, '|||') as names
+             GROUP_CONCAT(first_name SEPARATOR '|||') as first_names,
+             GROUP_CONCAT(last_name SEPARATOR '|||') as last_names
       FROM volunteers
       GROUP BY date
-    `);
-
-    const counts = countsStmt.all() as Array<{
-      date: string;
-      count: number;
-      names: string | null;
-    }>;
+    `)) as any[];
 
     const countsMap = new Map(
-      counts.map((c) => [c.date, { count: c.count, names: c.names }]),
+      counts.map((c) => [
+        c.date,
+        {
+          count: c.count,
+          first_names: c.first_names,
+          last_names: c.last_names,
+        },
+      ]),
     );
 
     // Regular Ramadan days
@@ -38,9 +43,13 @@ export async function GET() {
       const count = info?.count || 0;
       const isFull = count >= REGULAR_DAY_CAPACITY;
 
-      const volunteers = info?.names
-        ? info.names.split("|||").map((name) => ({ full_name: name }))
-        : [];
+      const volunteers =
+        info?.first_names && info?.last_names
+          ? info.first_names.split("|||").map((firstName, idx) => ({
+              first_name: firstName,
+              last_name: info.last_names!.split("|||")[idx] || "",
+            }))
+          : [];
 
       return {
         date,
@@ -55,9 +64,13 @@ export async function GET() {
     const eidEntry = getEidEntry();
     const eidInfo = countsMap.get(eidEntry);
     const eidCount = eidInfo?.count || 0;
-    const eidVolunteers = eidInfo?.names
-      ? eidInfo.names.split("|||").map((name) => ({ full_name: name }))
-      : [];
+    const eidVolunteers =
+      eidInfo?.first_names && eidInfo?.last_names
+        ? eidInfo.first_names.split("|||").map((firstName, idx) => ({
+            first_name: firstName,
+            last_name: eidInfo.last_names!.split("|||")[idx] || "",
+          }))
+        : [];
 
     const eidDayInfo: DayInfo = {
       date: eidEntry,
@@ -67,7 +80,15 @@ export async function GET() {
       volunteers: eidVolunteers,
     };
 
-    return NextResponse.json({ days: daysInfo, eid: eidDayInfo });
+    const response = NextResponse.json({ days: daysInfo, eid: eidDayInfo });
+
+    // Add caching headers
+    response.headers.set(
+      "Cache-Control",
+      "public, s-maxage=30, stale-while-revalidate=59",
+    );
+
+    return response;
   } catch (error) {
     console.error("Error fetching volunteers:", error);
     return NextResponse.json(
@@ -80,15 +101,23 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { date, full_name, phone_number } = body;
+    const { date, first_name, last_name, phone_number } = body;
 
     // Validation
-    if (!date || !full_name || !phone_number) {
+    if (!date || !first_name || !last_name || !phone_number) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 },
       );
     }
+
+    // Capitalize first character of first name and last name
+    const capitalizeFirstLetter = (str: string) => {
+      return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+    };
+
+    const formattedFirstName = capitalizeFirstLetter(first_name.trim());
+    const formattedLastName = capitalizeFirstLetter(last_name.trim());
 
     // Check if date is valid (either Ramadan date or Eid)
     const allDates = generateRamadanDates();
@@ -99,10 +128,11 @@ export async function POST(request: NextRequest) {
 
     // Check capacity for non-Eid days only
     if (date !== eidEntry) {
-      const countStmt = db.prepare(
+      const [rows] = (await db.query(
         "SELECT COUNT(*) as count FROM volunteers WHERE date = ?",
-      );
-      const result = countStmt.get(date) as { count: number };
+        [date],
+      )) as any[];
+      const result = rows[0] as { count: number };
 
       if (result.count >= REGULAR_DAY_CAPACITY) {
         return NextResponse.json(
@@ -112,18 +142,30 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Insert volunteer
-    const insertStmt = db.prepare(`
-      INSERT INTO volunteers (date, full_name, phone_number)
-      VALUES (?, ?, ?)
-    `);
+    // Check if volunteer already registered for this day (by phone number)
+    const [existingRows] = (await db.query(
+      "SELECT id FROM volunteers WHERE date = ? AND phone_number = ?",
+      [date, phone_number],
+    )) as any[];
 
-    const info = insertStmt.run(date, full_name, phone_number);
+    if (existingRows.length > 0) {
+      return NextResponse.json(
+        { error: "Already registered for this day" },
+        { status: 400 },
+      );
+    }
+
+    // Insert volunteer
+    const [result] = (await db.execute(
+      `INSERT INTO volunteers (date, first_name, last_name, phone_number)
+       VALUES (?, ?, ?, ?)`,
+      [date, formattedFirstName, formattedLastName, phone_number],
+    )) as any[];
 
     return NextResponse.json(
       {
         success: true,
-        id: info.lastInsertRowid,
+        id: result.insertId,
       },
       { status: 201 },
     );
@@ -141,6 +183,13 @@ export async function DELETE(request: NextRequest) {
     const body = await request.json();
     const { id, password } = body;
 
+    if (!ADMIN_PASSWORD) {
+      return NextResponse.json(
+        { error: "Admin password not configured" },
+        { status: 500 },
+      );
+    }
+
     // Verify admin password
     if (password !== ADMIN_PASSWORD) {
       return NextResponse.json({ error: "Invalid password" }, { status: 401 });
@@ -151,10 +200,11 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Delete the volunteer
-    const stmt = db.prepare("DELETE FROM volunteers WHERE id = ?");
-    const result = stmt.run(id);
+    const [result] = (await db.execute("DELETE FROM volunteers WHERE id = ?", [
+      id,
+    ])) as any[];
 
-    if (result.changes === 0) {
+    if (result.affectedRows === 0) {
       return NextResponse.json(
         { error: "Volunteer not found" },
         { status: 404 },

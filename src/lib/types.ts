@@ -1,7 +1,8 @@
 export interface Volunteer {
   id: number;
   date: string;
-  full_name: string;
+  first_name: string;
+  last_name: string;
   phone_number: string;
   created_at: string;
 }
@@ -12,6 +13,7 @@ export interface DayInfo {
   isFull: boolean;
   isEid: boolean;
   volunteers: Array<{
-    full_name: string;
+    first_name: string;
+    last_name: string;
   }>;
 }
