@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
 
     // Group by date
     const groupedByDate = volunteers.reduce(
-      (acc, volunteer) => {
+      (acc: Record<string, Volunteer[]>, volunteer) => {
         if (!acc[volunteer.date]) {
           acc[volunteer.date] = [];
         }
