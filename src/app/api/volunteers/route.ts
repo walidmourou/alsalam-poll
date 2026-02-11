@@ -26,7 +26,10 @@ export async function GET() {
       GROUP BY date
     `)) as any[];
 
-    const countsMap = new Map(
+    const countsMap = new Map<
+      string,
+      { count: number; first_names: string; last_names: string }
+    >(
       counts.map((c: any) => [
         c.date,
         {
